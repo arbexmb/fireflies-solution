@@ -1,9 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { suite, test } from '@testdeck/jest';
-import {
-  GetMeetingService,
-  SummarizeMeetingService,
-} from 'src/meeting/service';
+import { GetMeetingService } from 'src/meeting/service';
 import { Meeting } from 'src/meeting/schema';
 import { BadRequestException } from '@nestjs/common';
 import { MeetingDocument } from 'src/meeting/document';
@@ -42,7 +39,6 @@ export class GetMeetingServiceTest {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         GetMeetingService,
-        SummarizeMeetingService,
         {
           provide: MeetingDocument,
           useValue: {

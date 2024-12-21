@@ -1,7 +1,8 @@
 import mongoose from 'mongoose';
 import * as dotenv from 'dotenv';
 import { Logger } from '@nestjs/common';
-import { MeetingSchema, TaskSchema } from 'src/meeting/schema';
+import { MeetingSchema } from 'src/meeting/schema';
+import { TaskSchema } from 'src/task/schema';
 import { TaskStatusEnum } from 'src/meeting/enum';
 
 dotenv.config();

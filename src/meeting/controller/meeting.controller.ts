@@ -15,7 +15,7 @@ import {
   SummarizeMeetingService,
   UpdateMeetingService,
 } from 'src/meeting/service';
-import { AuthenticatedRequest } from 'src/meeting/middleware';
+import { AuthenticatedRequest } from 'src/middleware';
 import {
   CreateMeetingDto,
   MeetingDto,

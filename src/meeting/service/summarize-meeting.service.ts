@@ -2,8 +2,9 @@ import { Injectable, Logger } from '@nestjs/common';
 import { Meeting } from 'src/meeting/schema';
 import { MeetingDocument } from 'src/meeting/document';
 import { MeetingError } from 'src/meeting/error';
+import { CreateTasksService } from 'src/task/service';
 
-interface MeetingSummary {
+export interface MeetingSummary {
   summary: string;
   actionItems: string[];
 }
@@ -31,7 +32,10 @@ export class SummarizeMeetingService {
     'Draft sprint goals',
   ];
 
-  constructor(private readonly meetingDocument: MeetingDocument) {}
+  constructor(
+    private readonly meetingDocument: MeetingDocument,
+    private readonly createTasksService: CreateTasksService,
+  ) {}
 
   async perform(userId: string, id: string): Promise<void> {
     const meeting = await this.meetingDocument.get(id);
@@ -41,7 +45,10 @@ export class SummarizeMeetingService {
 
     const { summary, actionItems } = this.summarize(meeting);
 
-    await this.meetingDocument.update(id, { summary, actionItems });
+    await Promise.all([
+      this.meetingDocument.update(id, { summary, actionItems }),
+      this.createTasksService.perform(userId, id, actionItems),
+    ]);
   }
 
   summarize(meeting: Meeting): MeetingSummary {

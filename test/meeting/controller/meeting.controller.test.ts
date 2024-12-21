@@ -7,7 +7,7 @@ import {
   SummarizeMeetingService,
   UpdateMeetingService,
 } from 'src/meeting/service';
-import { AuthenticatedRequest } from 'src/meeting/middleware';
+import { AuthenticatedRequest } from 'src/middleware';
 import {
   CreateMeetingDto,
   MeetingDto,
@@ -18,6 +18,7 @@ import { BadRequestException } from '@nestjs/common';
 import { MeetingDocument } from 'src/meeting/document';
 import { MeetingError } from 'src/meeting/error';
 import { TaskStatusEnum } from 'src/meeting/enum';
+import { CreateTasksService } from 'src/task/service';
 
 @suite
 export class MeetingControllerTest {
@@ -68,6 +69,12 @@ export class MeetingControllerTest {
         CreateMeetingService,
         UpdateMeetingService,
         SummarizeMeetingService,
+        {
+          provide: CreateTasksService,
+          useValue: {
+            perform: jest.fn(),
+          },
+        },
         {
           provide: MeetingDocument,
           useValue: {
