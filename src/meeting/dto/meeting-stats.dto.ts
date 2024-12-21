@@ -17,11 +17,11 @@ export class GeneralStatsDto {
   longestMeeting: number;
 
   @Expose()
-  @Transform(({ value }) => parseFloat(value.toFixed(2)), { toPlainOnly: true })
+  @Transform(({ value }) => parseFloat(value.toFixed(2)))
   averageParticipants: number;
 
   @Expose()
-  @Transform(({ value }) => parseFloat(value.toFixed(2)), { toPlainOnly: true })
+  @Transform(({ value }) => parseFloat(value.toFixed(2)))
   averageDuration: number;
 }
 
