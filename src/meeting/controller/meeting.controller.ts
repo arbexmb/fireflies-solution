@@ -12,6 +12,7 @@ import {
 import {
   CreateMeetingService,
   GetMeetingService,
+  MeetingStatsService,
   SummarizeMeetingService,
   UpdateMeetingService,
 } from 'src/meeting/service';
@@ -19,6 +20,7 @@ import { AuthenticatedRequest } from 'src/middleware';
 import {
   CreateMeetingDto,
   MeetingDto,
+  MeetingStatsDto,
   UpdateMeetingDto,
 } from 'src/meeting/dto';
 
@@ -29,6 +31,7 @@ export class MeetingController {
     private readonly createMeetingService: CreateMeetingService,
     private readonly updateMeetingService: UpdateMeetingService,
     private readonly summarizeMeetingService: SummarizeMeetingService,
+    private readonly meetingStatsService: MeetingStatsService,
   ) {}
 
   @Get()
@@ -55,6 +58,16 @@ export class MeetingController {
       const meeting = await this.createMeetingService.perform(userId, body);
 
       return new MeetingDto(meeting);
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  @Get('stats')
+  @HttpCode(HttpStatus.OK)
+  async stats(): Promise<MeetingStatsDto> {
+    try {
+      return this.meetingStatsService.perform();
     } catch (error) {
       throw error;
     }

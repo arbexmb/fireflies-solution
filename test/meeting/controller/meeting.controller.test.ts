@@ -4,6 +4,7 @@ import { MeetingController } from 'src/meeting/controller';
 import {
   CreateMeetingService,
   GetMeetingService,
+  MeetingStatsService,
   SummarizeMeetingService,
   UpdateMeetingService,
 } from 'src/meeting/service';
@@ -15,10 +16,10 @@ import {
 } from 'src/meeting/dto';
 import { Meeting } from 'src/meeting/schema';
 import { BadRequestException } from '@nestjs/common';
-import { MeetingDocument } from 'src/meeting/document';
 import { MeetingError } from 'src/meeting/error';
 import { TaskStatusEnum } from 'src/task/enum';
 import { CreateTasksService } from 'src/task/service';
+import { MeetingDocument } from 'src/meeting/document';
 
 @suite
 export class MeetingControllerTest {
@@ -27,6 +28,7 @@ export class MeetingControllerTest {
   private createMeetingService: CreateMeetingService;
   private updateMeetingService: UpdateMeetingService;
   private summarizeMeetingService: SummarizeMeetingService;
+  private meetingStatsService: MeetingStatsService;
   private req: AuthenticatedRequest = {
     userId: 'user123',
   } as AuthenticatedRequest;
@@ -38,6 +40,7 @@ export class MeetingControllerTest {
       participants: ['John Doe', 'Jane Doe'],
       transcript: 'transcript test',
       summary: 'summary test',
+      duration: 30,
       actionItems: ['test1', 'test2'],
       tasks: [
         {
@@ -69,6 +72,7 @@ export class MeetingControllerTest {
         CreateMeetingService,
         UpdateMeetingService,
         SummarizeMeetingService,
+        MeetingStatsService,
         {
           provide: CreateTasksService,
           useValue: {
@@ -77,9 +81,7 @@ export class MeetingControllerTest {
         },
         {
           provide: MeetingDocument,
-          useValue: {
-            getMany: jest.fn(),
-          },
+          useValue: {},
         },
       ],
     }).compile();
@@ -93,6 +95,8 @@ export class MeetingControllerTest {
     this.summarizeMeetingService = module.get<SummarizeMeetingService>(
       SummarizeMeetingService,
     );
+    this.meetingStatsService =
+      module.get<MeetingStatsService>(MeetingStatsService);
 
     jest
       .spyOn(this.getMeetingService, 'getMany')
@@ -105,6 +109,9 @@ export class MeetingControllerTest {
       .mockResolvedValue(this.meetings[0]);
     jest.spyOn(this.updateMeetingService, 'perform').mockResolvedValue();
     jest.spyOn(this.summarizeMeetingService, 'perform').mockResolvedValue();
+    jest
+      .spyOn(this.meetingStatsService, 'perform')
+      .mockImplementation(jest.fn());
   }
 
   @test
@@ -269,5 +276,12 @@ export class MeetingControllerTest {
     const method = this.meetingController.summarize(this.req, 'id');
 
     await expect(method).rejects.toThrow(MeetingError.FORBIDDEN_ACTION);
+  }
+
+  @test
+  async '[stats] Should call service with correct data'() {
+    await this.meetingController.stats();
+
+    expect(this.meetingStatsService.perform).toHaveBeenCalledWith();
   }
 }

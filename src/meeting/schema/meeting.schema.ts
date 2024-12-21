@@ -15,6 +15,9 @@ export class Meeting {
   @Prop({ required: true, type: Date })
   date: Date;
 
+  @Prop({ required: true, type: Number })
+  duration: number;
+
   @Prop({ required: true, type: [String] })
   participants?: string[];
 

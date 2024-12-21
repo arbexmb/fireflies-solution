@@ -21,6 +21,7 @@ export class SummarizeMeetingServiceTest {
       participants: ['John Doe', 'Jane Doe'],
       transcript: 'transcript test',
       summary: 'summary test',
+      duration: 30,
       actionItems: ['test1', 'test2'],
       tasks: [
         {

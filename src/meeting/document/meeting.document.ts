@@ -2,6 +2,11 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Meeting } from 'src/meeting/schema';
+import {
+  GeneralStatsDto,
+  MeetingsByDayOfWeekDto,
+  TopParticipantDto,
+} from 'src/meeting/dto';
 
 @Injectable()
 export class MeetingDocument {
@@ -49,5 +54,85 @@ export class MeetingDocument {
       { $set: partialData },
       { new: true, lean: true },
     );
+  }
+
+  async getGeneralStats(): Promise<GeneralStatsDto> {
+    const [generalStats] = await this.meetingModel.aggregate([
+      {
+        $group: {
+          _id: null,
+          totalMeetings: { $sum: 1 },
+          totalParticipants: {
+            $sum: { $size: { $ifNull: ['$participants', []] } },
+          },
+          totalDuration: {
+            $sum: { $ifNull: ['$duration', 0] },
+          },
+          shortestMeeting: {
+            $min: { $ifNull: ['$duration', 0] },
+          },
+          longestMeeting: {
+            $max: { $ifNull: ['$duration', 0] },
+          },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          totalMeetings: 1,
+          totalParticipants: 1,
+          totalDuration: 1,
+          averageParticipants: {
+            $divide: ['$totalParticipants', '$totalMeetings'],
+          },
+          shortestMeeting: 1,
+          longestMeeting: 1,
+          averageDuration: {
+            $divide: ['$totalDuration', '$totalMeetings'],
+          },
+        },
+      },
+    ]);
+
+    return generalStats;
+  }
+
+  async getTopParticipants(): Promise<TopParticipantDto[]> {
+    return this.meetingModel.aggregate([
+      { $unwind: { path: '$participants', preserveNullAndEmptyArrays: true } },
+      {
+        $group: {
+          _id: '$participants',
+          meetingCount: { $sum: 1 },
+        },
+      },
+      { $sort: { meetingCount: -1 } },
+      { $limit: 5 },
+      { $project: { _id: 0, participant: '$_id', meetingCount: 1 } },
+    ]);
+  }
+
+  async getMeetingsByDayOfWeek(): Promise<MeetingsByDayOfWeekDto[]> {
+    return this.meetingModel.aggregate([
+      {
+        $addFields: {
+          dayOfWeek: { $dayOfWeek: '$date' },
+        },
+      },
+      {
+        $group: {
+          _id: '$dayOfWeek',
+          count: { $sum: 1 },
+        },
+      },
+      {
+        $project: {
+          dayOfWeek: '$_id',
+          count: 1,
+          _id: 0,
+        },
+      },
+      { $sort: { dayOfWeek: 1 } },
+    ]);
   }
 }

@@ -62,6 +62,7 @@ export class MongoDBSeed {
         participants: this.randomParticipants(),
         transcript: `This is a sample transcript for meeting ${i + 1}.`,
         summary: `Summary of meeting ${i + 1}`,
+        duration: Math.floor(Math.random() * (120 - 15 + 1)) + 15,
         actionItems: [
           `Action item 1 for meeting ${i + 1}`,
           `Action item 2 for meeting ${i + 1}`,

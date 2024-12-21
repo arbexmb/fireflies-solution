@@ -7,6 +7,7 @@ import { MeetingController } from 'src/meeting/controller';
 import {
   CreateMeetingService,
   GetMeetingService,
+  MeetingStatsService,
   SummarizeMeetingService,
   UpdateMeetingService,
 } from 'src/meeting/service';
@@ -30,8 +31,9 @@ import { TaskModule } from 'src/task/task.module';
     GetMeetingService,
     CreateMeetingService,
     UpdateMeetingService,
-    MeetingDocument,
     SummarizeMeetingService,
+    MeetingStatsService,
+    MeetingDocument,
   ],
   controllers: [MeetingController],
 })
