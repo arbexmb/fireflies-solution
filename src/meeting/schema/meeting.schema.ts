@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
 @Schema({ collection: 'meetings' })
-class Meeting {
+export class Meeting {
   constructor(data: Partial<Meeting>) {
     Object.assign(this, data);
   }
@@ -9,23 +9,23 @@ class Meeting {
   @Prop({ required: true, type: String })
   userId: string;
 
-  @Prop({ required: true, type: String })
+  @Prop({ type: String })
   title: string;
 
   @Prop({ required: true, type: Date })
   date: Date;
 
   @Prop({ required: true, type: [String] })
-  participants: string[];
+  participants?: string[];
 
-  @Prop({ required: true, type: String })
-  transcript: string;
+  @Prop({ type: String })
+  transcript?: string;
 
-  @Prop({ required: true, type: String })
-  summary: string;
+  @Prop({ type: String })
+  summary?: string;
 
-  @Prop({ required: true, type: [String] })
-  actionItems: string[];
+  @Prop({ type: [String] })
+  actionItems?: string[];
 }
 
 export const MeetingSchema = SchemaFactory.createForClass(Meeting);

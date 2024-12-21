@@ -4,6 +4,8 @@ import { MongooseConnectionOptions } from 'src/database';
 import { MeetingSchema } from 'src/meeting/schema';
 import { AuthMiddleware } from 'src/meeting/middleware';
 import { MeetingController } from 'src/meeting/controller';
+import { MeetingService } from 'src/meeting/service';
+import { MeetingDocument } from 'src/meeting/document';
 
 @Module({
   imports: [
@@ -17,6 +19,7 @@ import { MeetingController } from 'src/meeting/controller';
       },
     ]),
   ],
+  providers: [MeetingService, MeetingDocument],
   controllers: [MeetingController],
 })
 export class MeetingModule implements NestModule {
