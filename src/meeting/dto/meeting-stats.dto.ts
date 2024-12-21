@@ -1,4 +1,4 @@
-import { Expose } from 'class-transformer';
+import { Expose, Transform } from 'class-transformer';
 
 export class GeneralStatsDto {
   @Expose()
@@ -17,9 +17,11 @@ export class GeneralStatsDto {
   longestMeeting: number;
 
   @Expose()
+  @Transform(({ value }) => parseFloat(value.toFixed(2)), { toPlainOnly: true })
   averageParticipants: number;
 
   @Expose()
+  @Transform(({ value }) => parseFloat(value.toFixed(2)), { toPlainOnly: true })
   averageDuration: number;
 }
 

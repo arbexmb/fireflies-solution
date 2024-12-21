@@ -3,6 +3,7 @@ version: '3.8'
 services:
   mongo:
     image: mongo:7.0.11
+    container_name: mongo-container
     ports:
       - 27017:27017
     command: mongod --bind_ip_all --noauth
@@ -11,6 +12,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    container_name: nest-app-container
     ports:
       - "3000:3000"
     depends_on:

@@ -7,6 +7,7 @@ import {
   MeetingsByDayOfWeekDto,
   TopParticipantDto,
 } from 'src/meeting/dto';
+import { plainToInstance } from 'class-transformer';
 
 @Injectable()
 export class MeetingDocument {
@@ -32,12 +33,7 @@ export class MeetingDocument {
   }
 
   async getMany(userId: string): Promise<Meeting[]> {
-    return this.meetingModel
-      .find({ userId, date: { $gte: new Date() } })
-      .sort({ date: 1 })
-      .select('_id title date participants')
-      .limit(5)
-      .lean();
+    return this.meetingModel.find({ userId }).lean();
   }
 
   async create(meetingData: Partial<Meeting>): Promise<Meeting> {
@@ -94,7 +90,7 @@ export class MeetingDocument {
       },
     ]);
 
-    return generalStats;
+    return plainToInstance(GeneralStatsDto, generalStats);
   }
 
   async getTopParticipants(): Promise<TopParticipantDto[]> {
