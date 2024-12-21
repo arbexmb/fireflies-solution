@@ -17,7 +17,7 @@ import { Meeting } from 'src/meeting/schema';
 import { BadRequestException } from '@nestjs/common';
 import { MeetingDocument } from 'src/meeting/document';
 import { MeetingError } from 'src/meeting/error';
-import { TaskStatusEnum } from 'src/meeting/enum';
+import { TaskStatusEnum } from 'src/task/enum';
 import { CreateTasksService } from 'src/task/service';
 
 @suite

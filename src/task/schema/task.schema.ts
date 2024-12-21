@@ -1,6 +1,6 @@
 import { Schema as MongooseSchema } from 'mongoose';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { TaskStatusEnum } from 'src/meeting/enum';
+import { TaskStatusEnum } from 'src/task/enum';
 
 @Schema({ collection: 'tasks' })
 export class Task {
@@ -17,13 +17,7 @@ export class Task {
   @Prop({ required: true, type: String })
   title: string;
 
-  @Prop({
-    required: true,
-    type: String,
-    default: function (this: Task) {
-      return this.title;
-    },
-  })
+  @Prop({ required: false, type: String })
   description: string;
 
   @Prop({

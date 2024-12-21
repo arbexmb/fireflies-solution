@@ -3,8 +3,9 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { MongooseConnectionOptions } from 'src/database';
 import { AuthMiddleware } from 'src/middleware';
 import { TaskSchema } from 'src/task/schema';
-import { CreateTasksService } from 'src/task/service';
+import { CreateTasksService, GetTasksService } from 'src/task/service';
 import { TaskDocument } from 'src/task/document';
+import { TaskController } from 'src/task/controller';
 
 @Module({
   imports: [
@@ -18,8 +19,8 @@ import { TaskDocument } from 'src/task/document';
       },
     ]),
   ],
-  providers: [CreateTasksService, TaskDocument],
-  controllers: [],
+  providers: [CreateTasksService, GetTasksService, TaskDocument],
+  controllers: [TaskController],
   exports: [CreateTasksService],
 })
 export class TaskModule implements NestModule {

@@ -1,5 +1,5 @@
 import { Expose } from 'class-transformer';
-import { TaskDto } from 'src/meeting/dto';
+import { TaskDto } from 'src/task/dto';
 
 export class MeetingDto {
   constructor(data: Partial<MeetingDto>) {

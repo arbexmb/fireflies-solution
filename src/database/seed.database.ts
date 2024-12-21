@@ -3,7 +3,7 @@ import * as dotenv from 'dotenv';
 import { Logger } from '@nestjs/common';
 import { MeetingSchema } from 'src/meeting/schema';
 import { TaskSchema } from 'src/task/schema';
-import { TaskStatusEnum } from 'src/meeting/enum';
+import { TaskStatusEnum } from 'src/task/enum';
 
 dotenv.config();
 

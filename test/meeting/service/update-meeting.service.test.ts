@@ -5,7 +5,7 @@ import { Meeting } from 'src/meeting/schema';
 import { MeetingDocument } from 'src/meeting/document';
 import { UpdateMeetingDto } from 'src/meeting/dto';
 import { MeetingError } from 'src/meeting/error';
-import { TaskStatusEnum } from 'src/meeting/enum';
+import { TaskStatusEnum } from 'src/task/enum';
 
 @suite
 export class UpdateMeetingServiceTest {

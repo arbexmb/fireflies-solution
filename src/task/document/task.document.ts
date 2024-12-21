@@ -16,4 +16,8 @@ export class TaskDocument {
   async deleteTasks(meetingId: string): Promise<void> {
     await this.taskModel.deleteMany({ meetingId });
   }
+
+  async getByUser(userId: string): Promise<Task[]> {
+    return this.taskModel.find({ userId }).lean();
+  }
 }

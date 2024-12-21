@@ -1,4 +1,5 @@
 import { Expose } from 'class-transformer';
+import { TaskStatusEnum } from 'src/task/enum';
 
 export class TaskDto {
   constructor(data: Partial<TaskDto>) {
@@ -6,13 +7,10 @@ export class TaskDto {
   }
 
   @Expose()
-  _id: string;
+  userId: string;
 
   @Expose()
   meetingId: string;
-
-  @Expose()
-  userId: string;
 
   @Expose()
   title: string;
@@ -21,8 +19,8 @@ export class TaskDto {
   description: string;
 
   @Expose()
-  status: string;
+  dueDate: Date;
 
   @Expose()
-  dueDate: Date;
+  status: TaskStatusEnum;
 }
