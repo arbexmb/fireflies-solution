@@ -9,7 +9,12 @@ import {
   Post,
   Req,
 } from '@nestjs/common';
-import { MeetingService } from 'src/meeting/service';
+import {
+  CreateMeetingService,
+  GetMeetingService,
+  SummarizeMeetingService,
+  UpdateMeetingService,
+} from 'src/meeting/service';
 import { AuthenticatedRequest } from 'src/meeting/middleware';
 import {
   CreateMeetingDto,
@@ -19,14 +24,19 @@ import {
 
 @Controller('meetings')
 export class MeetingController {
-  constructor(private readonly meetingService: MeetingService) {}
+  constructor(
+    private readonly getMeetingService: GetMeetingService,
+    private readonly createMeetingService: CreateMeetingService,
+    private readonly updateMeetingService: UpdateMeetingService,
+    private readonly summarizeMeetingService: SummarizeMeetingService,
+  ) {}
 
   @Get()
   @HttpCode(HttpStatus.OK)
   async getMany(@Req() req: AuthenticatedRequest): Promise<MeetingDto[]> {
     try {
       const { userId } = req;
-      const meetings = await this.meetingService.getMany(userId);
+      const meetings = await this.getMeetingService.getMany(userId);
 
       return meetings.map((meeting) => new MeetingDto(meeting));
     } catch (error) {
@@ -42,7 +52,7 @@ export class MeetingController {
   ): Promise<MeetingDto> {
     try {
       const { userId } = req;
-      const meeting = await this.meetingService.create(userId, body);
+      const meeting = await this.createMeetingService.perform(userId, body);
 
       return new MeetingDto(meeting);
     } catch (error) {
@@ -54,7 +64,7 @@ export class MeetingController {
   @HttpCode(HttpStatus.OK)
   async get(@Param('id') id: string): Promise<MeetingDto> {
     try {
-      const meeting = await this.meetingService.get(id);
+      const meeting = await this.getMeetingService.get(id);
 
       return new MeetingDto(meeting);
     } catch (error) {
@@ -71,7 +81,21 @@ export class MeetingController {
   ): Promise<void> {
     try {
       const { userId } = req;
-      await this.meetingService.update(userId, id, body);
+      await this.updateMeetingService.perform(userId, id, body);
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  @Post(':id/summarize')
+  @HttpCode(HttpStatus.OK)
+  async summarize(
+    @Req() req: AuthenticatedRequest,
+    @Param('id') id: string,
+  ): Promise<void> {
+    try {
+      const { userId } = req;
+      await this.summarizeMeetingService.perform(userId, id);
     } catch (error) {
       throw error;
     }

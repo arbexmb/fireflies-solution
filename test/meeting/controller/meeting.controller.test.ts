@@ -1,7 +1,12 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { suite, test } from '@testdeck/jest';
 import { MeetingController } from 'src/meeting/controller';
-import { MeetingService } from 'src/meeting/service';
+import {
+  CreateMeetingService,
+  GetMeetingService,
+  SummarizeMeetingService,
+  UpdateMeetingService,
+} from 'src/meeting/service';
 import { AuthenticatedRequest } from 'src/meeting/middleware';
 import {
   CreateMeetingDto,
@@ -17,7 +22,10 @@ import { TaskStatusEnum } from 'src/meeting/enum';
 @suite
 export class MeetingControllerTest {
   private meetingController: MeetingController;
-  private meetingService: MeetingService;
+  private getMeetingService: GetMeetingService;
+  private createMeetingService: CreateMeetingService;
+  private updateMeetingService: UpdateMeetingService;
+  private summarizeMeetingService: SummarizeMeetingService;
   private req: AuthenticatedRequest = {
     userId: 'user123',
   } as AuthenticatedRequest;
@@ -56,7 +64,10 @@ export class MeetingControllerTest {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [MeetingController],
       providers: [
-        MeetingService,
+        GetMeetingService,
+        CreateMeetingService,
+        UpdateMeetingService,
+        SummarizeMeetingService,
         {
           provide: MeetingDocument,
           useValue: {
@@ -67,21 +78,35 @@ export class MeetingControllerTest {
     }).compile();
 
     this.meetingController = module.get<MeetingController>(MeetingController);
-    this.meetingService = module.get<MeetingService>(MeetingService);
+    this.getMeetingService = module.get<GetMeetingService>(GetMeetingService);
+    this.createMeetingService =
+      module.get<CreateMeetingService>(CreateMeetingService);
+    this.updateMeetingService =
+      module.get<UpdateMeetingService>(UpdateMeetingService);
+    this.summarizeMeetingService = module.get<SummarizeMeetingService>(
+      SummarizeMeetingService,
+    );
 
-    jest.spyOn(this.meetingService, 'getMany').mockResolvedValue(this.meetings);
     jest
-      .spyOn(this.meetingService, 'create')
+      .spyOn(this.getMeetingService, 'getMany')
+      .mockResolvedValue(this.meetings);
+    jest
+      .spyOn(this.createMeetingService, 'perform')
       .mockResolvedValue(this.meetings[0]);
-    jest.spyOn(this.meetingService, 'get').mockResolvedValue(this.meetings[0]);
-    jest.spyOn(this.meetingService, 'update').mockResolvedValue();
+    jest
+      .spyOn(this.getMeetingService, 'get')
+      .mockResolvedValue(this.meetings[0]);
+    jest.spyOn(this.updateMeetingService, 'perform').mockResolvedValue();
+    jest.spyOn(this.summarizeMeetingService, 'perform').mockResolvedValue();
   }
 
   @test
   async '[getMany] Should call service with correct data'() {
     await this.meetingController.getMany(this.req);
 
-    expect(this.meetingService.getMany).toHaveBeenCalledWith(this.req.userId);
+    expect(this.getMeetingService.getMany).toHaveBeenCalledWith(
+      this.req.userId,
+    );
   }
 
   @test
@@ -96,7 +121,7 @@ export class MeetingControllerTest {
   @test
   async '[getMany] Should throw an error when no meeting is found'() {
     jest
-      .spyOn(this.meetingService, 'getMany')
+      .spyOn(this.getMeetingService, 'getMany')
       .mockRejectedValue(MeetingError.MEETING_NOT_FOUND);
 
     const method = this.meetingController.getMany(this.req);
@@ -108,7 +133,7 @@ export class MeetingControllerTest {
   async '[create] Should call service with correct data'() {
     await this.meetingController.create(this.req, this.meetingPayload);
 
-    expect(this.meetingService.create).toHaveBeenCalledWith(
+    expect(this.createMeetingService.perform).toHaveBeenCalledWith(
       this.req.userId,
       this.meetingPayload,
     );
@@ -127,7 +152,7 @@ export class MeetingControllerTest {
   @test
   async '[create] Should throw an error when something went wrong'() {
     jest
-      .spyOn(this.meetingService, 'create')
+      .spyOn(this.createMeetingService, 'perform')
       .mockRejectedValue(new BadRequestException('Unexpected error'));
 
     const method = this.meetingController.create(this.req, this.meetingPayload);
@@ -141,7 +166,7 @@ export class MeetingControllerTest {
   async '[get] Should call service with correct data'() {
     await this.meetingController.get('id');
 
-    expect(this.meetingService.get).toHaveBeenCalledWith('id');
+    expect(this.getMeetingService.get).toHaveBeenCalledWith('id');
   }
 
   @test
@@ -154,7 +179,7 @@ export class MeetingControllerTest {
   @test
   async '[get] Should throw an error when no meeting is found'() {
     jest
-      .spyOn(this.meetingService, 'get')
+      .spyOn(this.getMeetingService, 'get')
       .mockRejectedValue(MeetingError.MEETING_NOT_FOUND);
 
     const method = this.meetingController.get('id');
@@ -170,7 +195,7 @@ export class MeetingControllerTest {
       this.updatePayload,
     );
 
-    expect(this.meetingService.update).toHaveBeenCalledWith(
+    expect(this.updateMeetingService.perform).toHaveBeenCalledWith(
       this.req.userId,
       'id',
       this.updatePayload,
@@ -180,7 +205,7 @@ export class MeetingControllerTest {
   @test
   async '[updateTranscript] Should throw an error when no meeting is found'() {
     jest
-      .spyOn(this.meetingService, 'update')
+      .spyOn(this.updateMeetingService, 'perform')
       .mockRejectedValue(MeetingError.MEETING_NOT_FOUND);
 
     const method = this.meetingController.updateTranscript(
@@ -195,7 +220,7 @@ export class MeetingControllerTest {
   @test
   async '[updateTranscript] Should throw an error when user tries to update other user meeting'() {
     jest
-      .spyOn(this.meetingService, 'update')
+      .spyOn(this.updateMeetingService, 'perform')
       .mockRejectedValue(MeetingError.FORBIDDEN_ACTION);
 
     const method = this.meetingController.updateTranscript(
@@ -203,6 +228,38 @@ export class MeetingControllerTest {
       'id',
       this.updatePayload,
     );
+
+    await expect(method).rejects.toThrow(MeetingError.FORBIDDEN_ACTION);
+  }
+
+  @test
+  async '[summarize] Should call service with correct data'() {
+    await this.meetingController.summarize(this.req, 'id');
+
+    expect(this.summarizeMeetingService.perform).toHaveBeenCalledWith(
+      this.req.userId,
+      'id',
+    );
+  }
+
+  @test
+  async '[summarize] Should throw an error when no meeting is found'() {
+    jest
+      .spyOn(this.summarizeMeetingService, 'perform')
+      .mockRejectedValue(MeetingError.MEETING_NOT_FOUND);
+
+    const method = this.meetingController.summarize(this.req, 'id');
+
+    await expect(method).rejects.toThrow(MeetingError.MEETING_NOT_FOUND);
+  }
+
+  @test
+  async '[summarize] Should throw an error when user tries to update other user meeting'() {
+    jest
+      .spyOn(this.summarizeMeetingService, 'perform')
+      .mockRejectedValue(MeetingError.FORBIDDEN_ACTION);
+
+    const method = this.meetingController.summarize(this.req, 'id');
 
     await expect(method).rejects.toThrow(MeetingError.FORBIDDEN_ACTION);
   }

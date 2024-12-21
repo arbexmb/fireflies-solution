@@ -5,5 +5,11 @@ export class UpdateMeetingDto {
   @IsNotEmpty()
   @IsString()
   @Expose()
-  transcript: string;
+  transcript?: string;
+
+  @Expose()
+  summary?: string;
+
+  @Expose()
+  actionItems?: string[];
 }
