@@ -8,6 +8,7 @@ import { Meeting } from 'src/meeting/schema';
 import { BadRequestException } from '@nestjs/common';
 import { MeetingDocument } from 'src/meeting/document';
 import { MeetingError } from 'src/meeting/error';
+import { TaskStatusEnum } from 'src/meeting/enum';
 
 @suite
 export class MeetingControllerTest {
@@ -25,6 +26,17 @@ export class MeetingControllerTest {
       transcript: 'transcript test',
       summary: 'summary test',
       actionItems: ['test1', 'test2'],
+      tasks: [
+        {
+          _id: '6765e6ba309804b9352d6be9',
+          meetingId: '6765e6ba309804b9352d6b83',
+          userId: 'user5',
+          title: 'Task 1 from Meeting 1',
+          description: 'This is a sample task from meeting Meeting 1',
+          status: TaskStatusEnum['in-progress'],
+          dueDate: '2024-02-04T09:36:58.711Z',
+        },
+      ],
     } as Meeting,
   ];
   private meetingPayload = {

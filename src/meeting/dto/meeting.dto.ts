@@ -1,4 +1,5 @@
 import { Expose } from 'class-transformer';
+import { TaskDto } from 'src/meeting/dto';
 
 export class MeetingDto {
   constructor(data: Partial<MeetingDto>) {
@@ -21,4 +22,16 @@ export class MeetingDto {
 
   @Expose()
   participantsCount: number;
+
+  @Expose()
+  transcript?: string;
+
+  @Expose()
+  summary?: string;
+
+  @Expose()
+  actionItems?: string[];
+
+  @Expose()
+  tasks: TaskDto[];
 }

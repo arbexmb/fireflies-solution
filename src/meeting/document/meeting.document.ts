@@ -10,7 +10,20 @@ export class MeetingDocument {
   ) {}
 
   async get(id: string): Promise<Meeting> {
-    return this.meetingModel.findOne({ _id: id }).lean();
+    const [meeting] = await this.meetingModel.aggregate([
+      { $match: { _id: new this.meetingModel.base.Types.ObjectId(id) } },
+      {
+        $lookup: {
+          from: 'tasks',
+          localField: '_id',
+          foreignField: 'meetingId',
+          as: 'tasks',
+        },
+      },
+      { $limit: 1 },
+    ]);
+
+    return meeting;
   }
 
   async getMany(userId: string): Promise<Meeting[]> {
