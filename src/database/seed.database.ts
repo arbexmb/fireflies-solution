@@ -26,7 +26,7 @@ export class MongoDBSeed {
   ];
 
   constructor() {
-    mongoose.connect(process.env.MONGO_DATABASE_URL);
+    mongoose.connect(process.env.MONGO_URI);
   }
 
   async run() {

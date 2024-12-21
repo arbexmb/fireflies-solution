@@ -11,7 +11,7 @@ dotenv.config();
 export class MongooseConnectionOptions implements MongooseOptionsFactory {
   createMongooseOptions(): MongooseModuleOptions {
     return {
-      uri: process.env.MONGO_DATABASE_URL,
+      uri: process.env.MONGO_URI,
     };
   }
 }
