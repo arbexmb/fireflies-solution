@@ -37,6 +37,8 @@ docker exec -it nest-app-container npm t
 - **Containerization:** Used Docker to containerize MongoDB and the application itself for easy setup and configuration.
 - **Added [@nestjs/mongoose](https://www.npmjs.com/package/@nestjs/mongoose):** Integrated Mongoose for MongoDB data modeling and validation in the NestJS framework.
 - **Authentication Middleware:** Applied authentication middleware across all layers to ensure security at every level.
+- **Unit Test:** Created unit tests for every line of every controller and service in the application.
+- **Added Duration Field in Meeting:** Added a duration field in the meeting model to better support the dashboard functionality (could be done with an endDate field as well).
 - **Mapped Application Errors:** Created a MeetingError class to provide a better error handling system with an error enum for clients.
 - **Granular Services:** Split services into smaller, more manageable classes with single responsibilities for better readability and maintenance.
 - **Input Validation:** Used class-validator to ensure proper input/payload validation for API requests.
@@ -46,7 +48,6 @@ docker exec -it nest-app-container npm t
 - **Barrel Imports:** Implemented barrel imports to simplify module imports and improve code organization.
 - **Absolute Paths:** Configured absolute paths to simplify imports and easier handling of files.
 - **Mock AI Implementation:** Created a mock implementation for AI, with comments indicating where AI would be used.
-- **Added Duration Field in Meeting:** Added a duration field in the meeting model to better support the dashboard functionality (could be done with an endDate field as well).
 - **Changed Participants Data:** Replaced participant names with userIds to ensure consistency, as names can repeat.
 
 ## Suggested Optimizations for the Future
@@ -126,7 +127,7 @@ curl --location --request GET 'http://localhost:3000/api/meetings/676744ce332aca
 --header 'x-user-id: user3'
 ```
 
-**Response**
+**Response (success)**
 
 ```json
 {
@@ -161,7 +162,17 @@ curl --location --request GET 'http://localhost:3000/api/meetings/676744ce332aca
 }
 ```
 
-### 4. **Update a meeting transcript**
+**Response (error)**
+
+```json
+{
+    "message": "MEETING_NOT_FOUND",
+    "error": "Not Found",
+    "statusCode": 404
+}
+```
+
+### 4. **Update a Meeting Transcript**
 
 **Request**
 
@@ -180,7 +191,7 @@ curl --location --request PATCH 'http://localhost:3000/api/meetings/676744ce332a
 HTTP/1.1 204 No Content
 ```
 
-### 5. **Summarize a meeting**
+### 5. **Summarize a Meeting**
 
 **Request**
 

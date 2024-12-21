@@ -1,5 +1,12 @@
 import { Expose } from 'class-transformer';
-import { ArrayNotEmpty, IsArray, IsNotEmpty, IsString } from 'class-validator';
+import {
+  ArrayNotEmpty,
+  IsArray,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 
 export class CreateMeetingDto {
   @IsNotEmpty()
@@ -16,4 +23,9 @@ export class CreateMeetingDto {
   @ArrayNotEmpty()
   @Expose()
   participants: string[];
+
+  @IsOptional()
+  @IsNumber()
+  @Expose()
+  duration?: number;
 }

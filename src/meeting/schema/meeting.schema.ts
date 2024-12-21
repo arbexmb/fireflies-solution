@@ -15,7 +15,7 @@ export class Meeting {
   @Prop({ required: true, type: Date })
   date: Date;
 
-  @Prop({ required: true, type: Number })
+  @Prop({ required: true, type: Number, default: 30 })
   duration: number;
 
   @Prop({ required: true, type: [String] })
