@@ -3,7 +3,11 @@ import { suite, test } from '@testdeck/jest';
 import { MeetingController } from 'src/meeting/controller';
 import { MeetingService } from 'src/meeting/service';
 import { AuthenticatedRequest } from 'src/meeting/middleware';
-import { CreateMeetingDto, MeetingDto } from 'src/meeting/dto';
+import {
+  CreateMeetingDto,
+  MeetingDto,
+  UpdateMeetingDto,
+} from 'src/meeting/dto';
 import { Meeting } from 'src/meeting/schema';
 import { BadRequestException } from '@nestjs/common';
 import { MeetingDocument } from 'src/meeting/document';
@@ -44,6 +48,9 @@ export class MeetingControllerTest {
     date: new Date('2024-12-12 10:00'),
     participants: ['John Doe', 'Jane Doe'],
   } as CreateMeetingDto;
+  private updatePayload = {
+    transcript: 'new transcript',
+  } as UpdateMeetingDto;
 
   async before() {
     const module: TestingModule = await Test.createTestingModule({
@@ -67,13 +74,14 @@ export class MeetingControllerTest {
       .spyOn(this.meetingService, 'create')
       .mockResolvedValue(this.meetings[0]);
     jest.spyOn(this.meetingService, 'get').mockResolvedValue(this.meetings[0]);
+    jest.spyOn(this.meetingService, 'update').mockResolvedValue();
   }
 
   @test
   async '[getMany] Should call service with correct data'() {
     await this.meetingController.getMany(this.req);
 
-    expect(this.meetingService.getMany).toHaveBeenCalledWith('user123');
+    expect(this.meetingService.getMany).toHaveBeenCalledWith(this.req.userId);
   }
 
   @test
@@ -101,7 +109,7 @@ export class MeetingControllerTest {
     await this.meetingController.create(this.req, this.meetingPayload);
 
     expect(this.meetingService.create).toHaveBeenCalledWith(
-      'user123',
+      this.req.userId,
       this.meetingPayload,
     );
   }
@@ -152,5 +160,50 @@ export class MeetingControllerTest {
     const method = this.meetingController.get('id');
 
     await expect(method).rejects.toThrow(MeetingError.MEETING_NOT_FOUND);
+  }
+
+  @test
+  async '[updateTranscript] Should call service with correct data'() {
+    await this.meetingController.updateTranscript(
+      this.req,
+      'id',
+      this.updatePayload,
+    );
+
+    expect(this.meetingService.update).toHaveBeenCalledWith(
+      this.req.userId,
+      'id',
+      this.updatePayload,
+    );
+  }
+
+  @test
+  async '[updateTranscript] Should throw an error when no meeting is found'() {
+    jest
+      .spyOn(this.meetingService, 'update')
+      .mockRejectedValue(MeetingError.MEETING_NOT_FOUND);
+
+    const method = this.meetingController.updateTranscript(
+      this.req,
+      'id',
+      this.updatePayload,
+    );
+
+    await expect(method).rejects.toThrow(MeetingError.MEETING_NOT_FOUND);
+  }
+
+  @test
+  async '[updateTranscript] Should throw an error when user tries to update other user meeting'() {
+    jest
+      .spyOn(this.meetingService, 'update')
+      .mockRejectedValue(MeetingError.FORBIDDEN_ACTION);
+
+    const method = this.meetingController.updateTranscript(
+      this.req,
+      'id',
+      this.updatePayload,
+    );
+
+    await expect(method).rejects.toThrow(MeetingError.FORBIDDEN_ACTION);
   }
 }

@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Meeting } from 'src/meeting/schema';
+import { UpdateMeetingDto } from 'src/meeting/dto';
 
 @Injectable()
 export class MeetingDocument {
@@ -40,5 +41,13 @@ export class MeetingDocument {
     const createdMeeting = await newMeeting.save();
 
     return createdMeeting.toObject();
+  }
+
+  async update(id: string, partialData: UpdateMeetingDto): Promise<void> {
+    await this.meetingModel.findByIdAndUpdate(
+      id,
+      { $set: partialData },
+      { new: true, lean: true },
+    );
   }
 }

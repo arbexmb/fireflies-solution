@@ -4,7 +4,7 @@ import { MeetingService } from 'src/meeting/service';
 import { Meeting } from 'src/meeting/schema';
 import { BadRequestException } from '@nestjs/common';
 import { MeetingDocument } from 'src/meeting/document';
-import { CreateMeetingDto } from 'src/meeting/dto';
+import { CreateMeetingDto, UpdateMeetingDto } from 'src/meeting/dto';
 import { MeetingError } from 'src/meeting/error';
 import { TaskStatusEnum } from 'src/meeting/enum';
 
@@ -15,7 +15,7 @@ export class MeetingServiceTest {
   private userId = '123';
   private meetings = [
     {
-      userId: '1',
+      userId: '123',
       title: 'test',
       date: new Date('2024-12-12'),
       participants: ['John Doe', 'Jane Doe'],
@@ -40,6 +40,9 @@ export class MeetingServiceTest {
     date: new Date('2024-12-12 10:00'),
     participants: ['John Doe', 'Jane Doe'],
   } as CreateMeetingDto;
+  private updatePayload = {
+    transcript: 'new transcript',
+  } as UpdateMeetingDto;
 
   async before() {
     const module: TestingModule = await Test.createTestingModule({
@@ -48,8 +51,10 @@ export class MeetingServiceTest {
         {
           provide: MeetingDocument,
           useValue: {
+            get: jest.fn(),
             getMany: jest.fn(),
             create: jest.fn(),
+            update: jest.fn(),
           },
         },
       ],
@@ -61,6 +66,7 @@ export class MeetingServiceTest {
     jest
       .spyOn(this.meetingDocument, 'getMany')
       .mockResolvedValue(this.meetings);
+    jest.spyOn(this.meetingDocument, 'get').mockResolvedValue(this.meetings[0]);
   }
 
   @test
@@ -78,7 +84,7 @@ export class MeetingServiceTest {
   }
 
   @test
-  async '[getMany] Should throw an error when no meetinf is found'() {
+  async '[getMany] Should throw an error when no meeting is found'() {
     jest.spyOn(this.meetingDocument, 'getMany').mockResolvedValue([]);
 
     const service = this.meetingService.getMany(this.userId);
@@ -107,5 +113,73 @@ export class MeetingServiceTest {
       userId: this.userId,
       ...this.meetingPayload,
     });
+  }
+
+  @test
+  async '[get] Should call document to find meeting'() {
+    await this.meetingService.get('id');
+
+    expect(this.meetingDocument.get).toHaveBeenCalledWith('id');
+  }
+
+  @test
+  async '[get] Should throw an error when no meeting is found'() {
+    jest.spyOn(this.meetingDocument, 'get').mockResolvedValue(null);
+
+    const service = this.meetingService.get('id');
+
+    await expect(service).rejects.toThrow(MeetingError.MEETING_NOT_FOUND);
+  }
+
+  @test
+  async '[get] Should return a meeting DTO object'() {
+    const result = await this.meetingService.get('id');
+
+    expect(result).toEqual(this.meetings[0]);
+  }
+
+  @test
+  async '[update] Should call document to find meeting'() {
+    await this.meetingService.update(this.userId, 'id', this.updatePayload);
+
+    expect(this.meetingDocument.get).toHaveBeenCalledWith('id');
+  }
+
+  @test
+  async '[update] Should throw an error if no meeting is found'() {
+    jest.spyOn(this.meetingDocument, 'get').mockResolvedValue(null);
+
+    const service = this.meetingService.update(
+      this.userId,
+      'id',
+      this.updatePayload,
+    );
+
+    await expect(service).rejects.toThrow(MeetingError.MEETING_NOT_FOUND);
+  }
+
+  @test
+  async '[update] Should throw an error if user tries to update another user meeting'() {
+    jest
+      .spyOn(this.meetingDocument, 'get')
+      .mockResolvedValue({ ...this.meetings[0], userId: 'another_user_id' });
+
+    const service = this.meetingService.update(
+      this.userId,
+      'id',
+      this.updatePayload,
+    );
+
+    await expect(service).rejects.toThrow(MeetingError.FORBIDDEN_ACTION);
+  }
+
+  @test
+  async '[update] Should call document method to update'() {
+    await this.meetingService.update(this.userId, 'id', this.updatePayload);
+
+    expect(this.meetingDocument.update).toHaveBeenCalledWith(
+      'id',
+      this.updatePayload,
+    );
   }
 }

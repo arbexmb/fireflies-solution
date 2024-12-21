@@ -5,12 +5,17 @@ import {
   HttpCode,
   HttpStatus,
   Param,
+  Patch,
   Post,
   Req,
 } from '@nestjs/common';
 import { MeetingService } from 'src/meeting/service';
 import { AuthenticatedRequest } from 'src/meeting/middleware';
-import { CreateMeetingDto, MeetingDto } from 'src/meeting/dto';
+import {
+  CreateMeetingDto,
+  MeetingDto,
+  UpdateMeetingDto,
+} from 'src/meeting/dto';
 
 @Controller('meetings')
 export class MeetingController {
@@ -52,6 +57,21 @@ export class MeetingController {
       const meeting = await this.meetingService.get(id);
 
       return new MeetingDto(meeting);
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  @Patch(':id/transcript')
+  @HttpCode(HttpStatus.OK)
+  async updateTranscript(
+    @Req() req: AuthenticatedRequest,
+    @Param('id') id: string,
+    @Body() body: UpdateMeetingDto,
+  ): Promise<void> {
+    try {
+      const { userId } = req;
+      await this.meetingService.update(userId, id, body);
     } catch (error) {
       throw error;
     }
