@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { MeetingDocument } from 'src/meeting/document';
-import { UpdateMeetingDto } from 'src/meeting/dto';
+import { UpdateMeetingTranscriptDto } from 'src/meeting/dto';
 import { MeetingError } from 'src/meeting/error';
 import { plainToInstance } from 'class-transformer';
 
@@ -11,7 +11,7 @@ export class UpdateMeetingService {
   async perform(
     userId: string,
     id: string,
-    updateParams: UpdateMeetingDto,
+    updateParams: UpdateMeetingTranscriptDto,
   ): Promise<void> {
     const meeting = await this.meetingDocument.get(id);
 
@@ -20,7 +20,7 @@ export class UpdateMeetingService {
 
     await this.meetingDocument.update(
       id,
-      plainToInstance(UpdateMeetingDto, updateParams, {
+      plainToInstance(UpdateMeetingTranscriptDto, updateParams, {
         exposeUnsetFields: false,
       }),
     );

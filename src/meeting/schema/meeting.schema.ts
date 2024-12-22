@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
-@Schema({ collection: 'meetings' })
+@Schema({ collection: 'meetings', versionKey: false })
 export class Meeting {
   constructor(data: Partial<Meeting>) {
     Object.assign(this, data);

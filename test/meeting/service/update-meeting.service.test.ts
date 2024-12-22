@@ -3,7 +3,7 @@ import { suite, test } from '@testdeck/jest';
 import { UpdateMeetingService } from 'src/meeting/service';
 import { Meeting } from 'src/meeting/schema';
 import { MeetingDocument } from 'src/meeting/document';
-import { UpdateMeetingDto } from 'src/meeting/dto';
+import { UpdateMeetingTranscriptDto } from 'src/meeting/dto';
 import { MeetingError } from 'src/meeting/error';
 import { TaskStatusEnum } from 'src/task/enum';
 
@@ -37,7 +37,7 @@ export class UpdateMeetingServiceTest {
   ];
   private updatePayload = {
     transcript: 'new transcript',
-  } as UpdateMeetingDto;
+  } as UpdateMeetingTranscriptDto;
 
   async before() {
     const module: TestingModule = await Test.createTestingModule({

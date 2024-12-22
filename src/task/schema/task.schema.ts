@@ -2,7 +2,7 @@ import { Schema as MongooseSchema } from 'mongoose';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { TaskStatusEnum } from 'src/task/enum';
 
-@Schema({ collection: 'tasks' })
+@Schema({ collection: 'tasks', versionKey: false })
 export class Task {
   constructor(data: Partial<Task>) {
     Object.assign(this, data);

@@ -12,7 +12,7 @@ import { AuthenticatedRequest } from 'src/middleware';
 import {
   CreateMeetingDto,
   MeetingDto,
-  UpdateMeetingDto,
+  UpdateMeetingTranscriptDto,
 } from 'src/meeting/dto';
 import { Meeting } from 'src/meeting/schema';
 import { BadRequestException } from '@nestjs/common';
@@ -62,7 +62,7 @@ export class MeetingControllerTest {
   } as CreateMeetingDto;
   private updatePayload = {
     transcript: 'new transcript',
-  } as UpdateMeetingDto;
+  } as UpdateMeetingTranscriptDto;
 
   async before() {
     const module: TestingModule = await Test.createTestingModule({
@@ -134,13 +134,11 @@ export class MeetingControllerTest {
 
   @test
   async '[getMany] Should throw an error when no meeting is found'() {
-    jest
-      .spyOn(this.getMeetingService, 'getMany')
-      .mockRejectedValue(MeetingError.MEETING_NOT_FOUND);
+    jest.spyOn(this.getMeetingService, 'getMany').mockResolvedValue([]);
 
-    const method = this.meetingController.getMany(this.req);
+    const method = await this.meetingController.getMany(this.req);
 
-    await expect(method).rejects.toThrow(MeetingError.MEETING_NOT_FOUND);
+    expect(method).toEqual([]);
   }
 
   @test

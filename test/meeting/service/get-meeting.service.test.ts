@@ -77,9 +77,9 @@ export class GetMeetingServiceTest {
   async '[getMany] Should throw an error when no meeting is found'() {
     jest.spyOn(this.meetingDocument, 'getMany').mockResolvedValue([]);
 
-    const service = this.getMeetingService.getMany(this.userId);
+    const service = await this.getMeetingService.getMany(this.userId);
 
-    await expect(service).rejects.toThrow(MeetingError.MEETING_NOT_FOUND);
+    expect(service).toEqual([]);
   }
 
   @test
